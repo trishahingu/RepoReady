@@ -1,3 +1,4 @@
+
 import json
 from datetime import datetime
 from pathlib import Path
@@ -7,6 +8,7 @@ from rich.table import Table
 from rich.panel import Panel
 
 console = Console()
+
 
 def display_report(scan_results: dict, health: dict):
     """Display repository scan results in the terminal."""
@@ -26,11 +28,21 @@ def display_report(scan_results: dict, health: dict):
     table.add_column("Status", justify="center")
 
     for filename, details in scan_results.items():
-        status = (
-            "[green]FOUND[/green]"
-            if details["exists"]
-            else "[red]MISSING[/red]"
-        )
+        if filename == "tests/":
+            test_status = details["status"].lower()
+
+            if test_status == "found":
+                status = "[green]FOUND[/green]"
+            elif test_status == "empty":
+                status = "[yellow]EMPTY[/yellow]"
+            else:
+                status = "[red]MISSING[/red]"
+        else:
+            status = (
+                "[green]FOUND[/green]"
+                if details["exists"]
+                else "[red]MISSING[/red]"
+            )
 
         table.add_row(
             filename,
@@ -52,6 +64,7 @@ def display_report(scan_results: dict, health: dict):
             border_style="green",
         )
     )
+
 
 def export_json_report(scan_results: dict, health: dict, output_path: str):
     """Export repository analysis as JSON."""
