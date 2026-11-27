@@ -28,19 +28,21 @@ def scan_repository(repo_path: str) -> dict:
 
     for filename, description in REQUIRED_FILES.items():
         file_path = root / filename
+        exists = file_path.is_file()
 
         results[filename] = {
             "description": description,
-            "exists": file_path.is_file(),
-            "status": "Found" if file_path.is_file() else "Missing",
+            "exists": exists,
+            "status": "Found" if exists else "Missing",
         }
 
     tests_path = root / "tests"
+    tests_exists = tests_path.is_dir()
 
     results["tests/"] = {
         "description": "Automated test directory",
-        "exists": tests_path.is_dir(),
-        "status": "Found" if tests_path.is_dir() else "Missing",
+        "exists": tests_exists,
+        "status": "Found" if tests_exists else "Missing",
     }
 
     return results

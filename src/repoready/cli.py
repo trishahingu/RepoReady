@@ -16,11 +16,13 @@ def main():
         prog="repoready",
         description="Analyze a repository's open-source health."
     )
+
     parser.add_argument(
-    "--version",
-    action="version",
-    version="RepoReady 0.1.0",
-)
+        "--version",
+        action="version",
+        version="RepoReady 0.1.0",
+    )
+
     parser.add_argument(
         "path",
         nargs="?",
@@ -56,7 +58,7 @@ def main():
             export_markdown_report(results, health, args.markdown)
             print(f"Markdown report saved to: {args.markdown}")
 
-    except (FileNotFoundError, NotADirectoryError) as error:
+    except (FileNotFoundError, NotADirectoryError, OSError) as error:
         print(f"Error: {error}", file=sys.stderr)
         sys.exit(1)
 

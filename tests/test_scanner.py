@@ -117,3 +117,47 @@ def test_cli_markdown_export(tmp_path, monkeypatch):
 
     assert "# RepoReady - Repository Health Report" in content
     assert "README.md" in content
+def test_cli_invalid_repository_path(monkeypatch):
+    """Check that CLI handles invalid repository paths."""
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["repoready", "nonexistent_repository_12345"]
+    )
+
+    with pytest.raises(SystemExit) as error:
+        main()
+
+    assert error.value.code == 1
+
+
+    
+def test_cli_invalid_repository_path(monkeypatch):
+    """Check that CLI handles invalid repository paths."""
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["repoready", "nonexistent_repository_12345"]
+    )
+
+    with pytest.raises(SystemExit) as error:
+        main()
+
+    assert error.value.code == 1
+
+
+def test_cli_json_export_invalid_path(tmp_path, monkeypatch):
+    """Check that CLI handles invalid JSON export paths."""
+
+    output = tmp_path / "missing_folder" / "report.json"
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["repoready", str(tmp_path), "--json", str(output)]
+    )
+
+    with pytest.raises(SystemExit) as error:
+        main()
+
+    assert error.value.code == 1
+    assert not output.exists()

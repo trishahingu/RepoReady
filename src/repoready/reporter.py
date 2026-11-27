@@ -1,13 +1,12 @@
 import json
 from datetime import datetime
 from pathlib import Path
+
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-from rich.progress_bar import ProgressBar
 
 console = Console()
-
 
 def display_report(scan_results: dict, health: dict):
     """Display repository scan results in the terminal."""
