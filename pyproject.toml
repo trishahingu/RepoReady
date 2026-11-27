@@ -22,6 +22,10 @@ dev = [
     "pytest>=8.0"
 ]
 
+dashboard = [
+    "streamlit>=1.40"
+]
+
 [project.scripts]
 repoready = "repoready.cli:main"
 
