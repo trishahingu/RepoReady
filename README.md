@@ -1,5 +1,5 @@
 # 🚀 RepoReady
-
+![RepoReady Tests](https://github.com/trishahingu/RepoReady/actions/workflows/tests.yml/badge.svg)
 **Make your repository ready for contributors.**
 
 RepoReady is an open-source Python CLI tool that analyzes local repositories and checks whether essential files and structures are present for open-source collaboration.
