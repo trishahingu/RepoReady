@@ -1,21 +1,26 @@
 # 🚀 RepoReady
+
 ![RepoReady Tests](https://github.com/trishahingu/RepoReady/actions/workflows/tests.yml/badge.svg)
+
 **Make your repository ready for contributors.**
 
-RepoReady is an open-source Python CLI tool that analyzes local repositories and checks whether essential files and structures are present for open-source collaboration.
+RepoReady is an open-source Python tool that analyzes local repositories and checks whether essential files and structures are present for open-source collaboration. It provides both a command-line interface (CLI) and an interactive Streamlit dashboard.
 
 ## ✨ Features
 
 - 📁 **Repository Scanner** – Checks essential project files and directories.
 - 📊 **Health Score** – Calculates a repository health score out of 100.
 - 🖥️ **CLI Interface** – Analyze repositories directly from your terminal.
+- 🌐 **Interactive Dashboard** – Analyze repositories through a Streamlit web interface.
 - 📄 **JSON Export** – Generate machine-readable analysis reports.
 - 📝 **Markdown Export** – Generate readable repository reports.
+- 💡 **Improvement Recommendations** – Identify missing files and suggested improvements.
 - ⚡ **Version & Help** – Access CLI version and command information.
 
 ## 🛠️ Technologies
 
 - Python
+- Streamlit
 - argparse
 - Rich
 - pytest
@@ -29,13 +34,15 @@ git clone https://github.com/trishahingu/RepoReady.git
 cd RepoReady
 ```
 
-Install RepoReady:
+Install RepoReady with development and dashboard dependencies:
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dashboard,dev]"
 ```
 
 ## 🚀 Usage
+
+### Command-Line Interface
 
 Analyze the current repository:
 
@@ -72,6 +79,32 @@ Display help:
 ```bash
 repoready --help
 ```
+
+### 🌐 Streamlit Dashboard
+
+Launch the interactive dashboard:
+
+```bash
+python -m streamlit run app.py
+```
+
+Open the local URL displayed in your terminal, usually:
+
+```text
+http://localhost:8501
+```
+
+Enter your repository's local path and click **Analyze Repository**.
+
+### Dashboard Features
+
+- Repository path input and scanning.
+- Visual repository health score.
+- Files found and missing statistics.
+- Repository analysis table.
+- JSON and Markdown report downloads.
+- Automatic improvement recommendations.
+- About and usage guide pages.
 
 ## 🔍 What Does RepoReady Check?
 
