@@ -13,7 +13,8 @@ REQUIRED_FILES = {
 
 def scan_repository(repo_path: str) -> dict:
     """
-    Scan a local repository for essential open-source files.
+    Scan a local repository for essential open-source files
+    and check whether the tests directory contains Python test files.
     """
 
     root = Path(repo_path).expanduser().resolve()
@@ -26,6 +27,7 @@ def scan_repository(repo_path: str) -> dict:
 
     results = {}
 
+    # Check required project files
     for filename, description in REQUIRED_FILES.items():
         file_path = root / filename
         exists = file_path.is_file()
@@ -36,13 +38,35 @@ def scan_repository(repo_path: str) -> dict:
             "status": "Found" if exists else "Missing",
         }
 
+    # Check tests directory
     tests_path = root / "tests"
     tests_exists = tests_path.is_dir()
 
+    # Detect Python test files, including nested directories
+    if tests_exists:
+        test_files = {
+            *tests_path.rglob("test_*.py"),
+            *tests_path.rglob("*_test.py"),
+        }
+    else:
+        test_files = set()
+
+    has_test_files = bool(test_files)
+
+    # Determine test directory status
+    if not tests_exists:
+        test_status = "Missing"
+    elif not has_test_files:
+        test_status = "Empty"
+    else:
+        test_status = "Found"
+
     results["tests/"] = {
-        "description": "Automated test directory",
+        "description": "Automated Python test directory",
         "exists": tests_exists,
-        "status": "Found" if tests_exists else "Missing",
+        "has_test_files": has_test_files,
+        "test_file_count": len(test_files),
+        "status": test_status,
     }
 
     return results

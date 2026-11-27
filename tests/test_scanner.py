@@ -1,9 +1,16 @@
-from repoready.cli import main
+
 import json
+
 import pytest
+
+from repoready.cli import main
 from repoready.scorer import calculate_health_score
 from repoready.scanner import scan_repository
 
+
+# --------------------------------
+# Repository Scanner Tests
+# --------------------------------
 
 def test_scan_repository_finds_existing_files(tmp_path):
     """Check that the scanner identifies existing files."""
@@ -17,6 +24,7 @@ def test_scan_repository_finds_existing_files(tmp_path):
     assert results["README.md"]["exists"] is True
     assert results["LICENSE"]["exists"] is True
     assert results["tests/"]["exists"] is True
+    assert results["tests/"]["status"] == "Empty"
 
 
 def test_scan_repository_detects_missing_files(tmp_path):
@@ -26,6 +34,7 @@ def test_scan_repository_detects_missing_files(tmp_path):
 
     assert results["README.md"]["exists"] is False
     assert results["CONTRIBUTING.md"]["status"] == "Missing"
+    assert results["tests/"]["status"] == "Missing"
 
 
 def test_scan_repository_rejects_invalid_path():
@@ -43,6 +52,75 @@ def test_scan_repository_rejects_file_path(tmp_path):
 
     with pytest.raises(NotADirectoryError):
         scan_repository(str(file_path))
+
+
+def test_scan_repository_detects_test_files(tmp_path):
+    """Check that Python test files are detected."""
+
+    tests_path = tmp_path / "tests"
+    tests_path.mkdir()
+
+    (tests_path / "test_scanner.py").write_text(
+        "def test_example():\n    assert True\n"
+    )
+
+    results = scan_repository(str(tmp_path))
+
+    assert results["tests/"]["exists"] is True
+    assert results["tests/"]["has_test_files"] is True
+    assert results["tests/"]["test_file_count"] == 1
+    assert results["tests/"]["status"] == "Found"
+
+
+def test_scan_repository_detects_empty_tests_directory(tmp_path):
+    """Check that an empty tests directory is identified."""
+
+    (tmp_path / "tests").mkdir()
+
+    results = scan_repository(str(tmp_path))
+
+    assert results["tests/"]["exists"] is True
+    assert results["tests/"]["has_test_files"] is False
+    assert results["tests/"]["test_file_count"] == 0
+    assert results["tests/"]["status"] == "Empty"
+
+
+def test_scan_repository_detects_nested_test_files(tmp_path):
+    """Check that test files in nested directories are detected."""
+
+    nested_tests = tmp_path / "tests" / "unit"
+    nested_tests.mkdir(parents=True)
+
+    (nested_tests / "test_example.py").write_text(
+        "def test_example():\n    assert True\n"
+    )
+
+    results = scan_repository(str(tmp_path))
+
+    assert results["tests/"]["has_test_files"] is True
+    assert results["tests/"]["test_file_count"] == 1
+    assert results["tests/"]["status"] == "Found"
+
+
+def test_scan_repository_detects_alternative_test_filename(tmp_path):
+    """Check that files ending with _test.py are detected."""
+
+    tests_path = tmp_path / "tests"
+    tests_path.mkdir()
+
+    (tests_path / "scanner_test.py").write_text(
+        "def test_example():\n    assert True\n"
+    )
+
+    results = scan_repository(str(tmp_path))
+
+    assert results["tests/"]["has_test_files"] is True
+    assert results["tests/"]["status"] == "Found"
+
+
+# --------------------------------
+# Health Score Tests
+# --------------------------------
 
 def test_health_score_all_files_found():
     results = {
@@ -77,8 +155,13 @@ def test_health_score_empty_results():
     assert score["score"] == 0
     assert score["grade"] == "N/A"
 
+
+# --------------------------------
+# CLI Tests
+# --------------------------------
+
 def test_cli_json_export(tmp_path, monkeypatch):
-    from repoready.cli import main
+    """Check that CLI exports a JSON report."""
 
     (tmp_path / "README.md").write_text("# Test")
     output = tmp_path / "report.json"
@@ -99,7 +182,7 @@ def test_cli_json_export(tmp_path, monkeypatch):
 
 
 def test_cli_markdown_export(tmp_path, monkeypatch):
-    from repoready.cli import main
+    """Check that CLI exports a Markdown report."""
 
     (tmp_path / "README.md").write_text("# Test")
     output = tmp_path / "report.md"
@@ -117,21 +200,8 @@ def test_cli_markdown_export(tmp_path, monkeypatch):
 
     assert "# RepoReady - Repository Health Report" in content
     assert "README.md" in content
-def test_cli_invalid_repository_path(monkeypatch):
-    """Check that CLI handles invalid repository paths."""
-
-    monkeypatch.setattr(
-        "sys.argv",
-        ["repoready", "nonexistent_repository_12345"]
-    )
-
-    with pytest.raises(SystemExit) as error:
-        main()
-
-    assert error.value.code == 1
 
 
-    
 def test_cli_invalid_repository_path(monkeypatch):
     """Check that CLI handles invalid repository paths."""
 
